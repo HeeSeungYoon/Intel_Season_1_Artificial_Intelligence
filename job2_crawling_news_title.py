@@ -23,25 +23,35 @@ category = ['Politics','Economic','Social','Culture','World','Science']
 pages = [110, 110, 110, 75, 110, 72]
 df_titles = pd.DataFrame()
 
-for c in range(len(category)):
+for l in range(len(category)):
     titles = []
-    section_url = 'https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=10{}'.format(c)
-    for p in range(2):
-        url = section_url+'#&date=%2000:00:00&page={}'.format(p+1)
+    section_url = 'https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=10{}'.format(l)
+    for k in range(1, pages[l]+1):
+        url = section_url+'#&date=%2000:00:00&page={}'.format(k)
         driver.get(url)
         time.sleep(0.5)
-        for ul in range(4):
-            for li in range(5):
-                title = driver.find_element('xpath','//*[@id="section_body"]/ul[{}]/li[{}]/dl/dt[2]/a'.format(ul+1, li+1)).text
-                title = re.compile('[^가-힣]').sub(' ',title)
-                titles.append(title)
+        for i in range(1, 6):
+            for j in range(1, 6):
+                try:
+                    title = driver.find_element('xpath','//*[@id="section_body"]/ul[{}]/li[{}]/dl/dt[2]/a'.format(i+1, j+1)).text
+                    title = re.compile('[^가-힣]').sub(' ',title)
+                    titles.append(title)
+                except:
+                    print('error {} {} {} {}'.format(l, k, i, j))
+    if k % 10 ==0:
+        df_section_title = pd.DataFrame(titles, columns=['titles'])
+        df_section_title['category'] = category[l]
+        df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
+        df_titles.to_csv('./crawling_data/crawling_data_{}_{}.csv'.format(l, k), index=False)
+
 
     df_section_title = pd.DataFrame(titles,columns=['titles'])
-    df_section_title['category']=category[c]
+    df_section_title['category']=category[l]
     df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
 
 print(df_titles.head(30))
 print(df_titles.info())
+print(df_titles['category'].value_counts())
 #df_titles.to_csv('./crawling_data/naver_news_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d')))
 
 
