@@ -26,24 +26,30 @@ df_titles = pd.DataFrame()
 for c in range(len(category)):
     titles = []
     section_url = 'https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=10{}'.format(c)
-    for p in range(2):
-        url = section_url+'#&date=%2000:00:00&page={}'.format(p+1)
+    for page in range(1,pages[c]+1):
+        url = section_url+'#&date=%2000:00:00&page={}'.format(page)
         driver.get(url)
         time.sleep(0.5)
-        for ul in range(4):
-            for li in range(5):
-                title = driver.find_element('xpath','//*[@id="section_body"]/ul[{}]/li[{}]/dl/dt[2]/a'.format(ul+1, li+1)).text
-                title = re.compile('[^가-힣]').sub(' ',title)
-                titles.append(title)
+        for ul in range(1,5):
+            for li in range(1,6):
+                try:
+                    title = driver.find_element('xpath','//*[@id="section_body"]/ul[{}]/li[{}]/dl/dt[2]/a'.format(ul, li)).text
+                    title = re.compile('[^가-힣]').sub(' ',title)
+                    titles.append(title)
+                except:
+                    print('error {} {}page {} {}'.format(category[c],page,ul,li))
 
-    df_section_title = pd.DataFrame(titles,columns=['titles'])
-    df_section_title['category']=category[c]
+        if page % 10 == 0:
+            df_section_title = pd.DataFrame(titles,columns=['titles'])
+            df_section_title['category']=category[c]
+            df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
+            df_titles.to_csv('./crawling_data/naver_news_{}_{}_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d'),category[c],page), index=False)
+            titles = []
+
+    df_section_title = pd.DataFrame(titles, columns=['titles'])
+    df_section_title['category'] = category[c]
     df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
-
-print(df_titles.head(30))
-print(df_titles.info())
-#df_titles.to_csv('./crawling_data/naver_news_{}.csv'.format(datetime.datetime.now().strftime('%Y%m%d')))
-
+    df_titles.to_csv('./crawling_data/naver_news_{}_{}_last.csv'.format(datetime.datetime.now().strftime('%Y%m%d'), category[c]), index=False)
 
 # //*[@id="section_body"]/ul[1]/li[1]/dl/dt[2]/a
 # //*[@id="section_body"]/ul[2]/li[1]/dl/dt[2]/a
