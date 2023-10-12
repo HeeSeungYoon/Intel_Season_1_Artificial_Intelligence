@@ -44,7 +44,7 @@ token.fit_on_texts(X)
 tokened_X = token.texts_to_sequences(X)
 wordsize = len(token.word_index)+1
 
-with open('./models/news_token.picle','wb') as f:
+with open('./models/news_token.pickle','wb') as f:
     pickle.dump(token, f)
 
 # 제일 긴 문장의 길이에 맞게 다른 문장들을 패딩
