@@ -34,7 +34,7 @@ for c in range(3,len(category)):
             for li in range(1,6):
                 try:
                     title = driver.find_element('xpath','//*[@id="section_body"]/ul[{}]/li[{}]/dl/dt[2]/a'.format(ul, li)).text
-                    title = re.compile('[^가-힣]').sub(' ',title)
+                    title = re.compile('[^가-힣|a-z|A-Z]').sub(' ',title)
                     titles.append(title)
                 except:
                     print('error {} {}page {} {}'.format(category[c],page,ul,li))
@@ -50,8 +50,6 @@ for c in range(3,len(category)):
     df_section_title['category'] = category[c]
     df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
     df_titles.to_csv('./crawling_data/naver_news_{}_{}_last.csv'.format(datetime.datetime.now().strftime('%Y%m%d'), category[c]), index=False)
-
-    print(df_titles['category'].value_counts())
 
 # //*[@id="section_body"]/ul[1]/li[1]/dl/dt[2]/a
 # //*[@id="section_body"]/ul[2]/li[1]/dl/dt[2]/a
