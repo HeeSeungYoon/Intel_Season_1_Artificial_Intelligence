@@ -21,10 +21,10 @@ driver = webdriver.Chrome(service=service, options=options)
 
 category = ['Politics','Economic','Social','Culture','World','Science']
 pages = [110, 110, 110, 75, 110, 72]
-df_titles = pd.DataFrame()
 
-for c in range(len(category)):
+for c in range(3,len(category)):
     titles = []
+    df_titles = pd.DataFrame()
     section_url = 'https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=10{}'.format(c)
     for page in range(1,pages[c]+1):
         url = section_url+'#&date=%2000:00:00&page={}'.format(page)
@@ -50,6 +50,8 @@ for c in range(len(category)):
     df_section_title['category'] = category[c]
     df_titles = pd.concat([df_titles, df_section_title], ignore_index=True)
     df_titles.to_csv('./crawling_data/naver_news_{}_{}_last.csv'.format(datetime.datetime.now().strftime('%Y%m%d'), category[c]), index=False)
+
+    print(df_titles['category'].value_counts())
 
 # //*[@id="section_body"]/ul[1]/li[1]/dl/dt[2]/a
 # //*[@id="section_body"]/ul[2]/li[1]/dl/dt[2]/a
